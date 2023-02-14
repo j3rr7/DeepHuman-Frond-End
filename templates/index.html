@@ -58,6 +58,8 @@
           progressBar.style.width = '0%';
 
           var progress = 0;
+          var elapsed_time_seconds = 0;
+          
           var interval = setInterval(function() {
             progress += 1;
 
@@ -74,6 +76,7 @@
             elapsed_time += second + 's';
 
             progressBar.style.width = progress + '%';
+
             // change text progress_text
             var progressText = document.getElementById('progress_text');
             progressText.textContent = 'Uploading... ' + progress + '%';
@@ -84,16 +87,16 @@
               progressText.textContent = 'Running Optimization... ' + progress + '%';
               clearInterval(interval);
             }
-            if (progress >= 300) {
+            if (progress >= 150) {
               progressText.textContent = 'Loaded vertices and constructing network normal refiner' + elapsed_time;
             }
-            if (progress >= 400) {
+            if (progress >= 180) {
               progressText.textContent = 'Constructing network... ' + elapsed_time;
             }
-            if (progress >= 480) {
+            if (progress >= 190) {
               progressText.textContent = 'The whole graph has 12548944 trainable parameters... ' + elapsed_time;
             }
-            if (progress >= 500){
+            if (progress >= 200){
               progressText.textContent = 'Done. Waiting for post processing...';
             }
           }, 1000);
