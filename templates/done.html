@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+              colors: {
+                clifford: '#da373d',
+              }
+            }
+          }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.149.0/three.min.js" integrity="sha512-6p9lGA4Cm89KiwN1CixiOVQU2H9e13LeYoN6/Hj/qoUhtrMW5vNiqQz9Z96Z7/I8u89ghL6SPBz9na5HFVzF3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+    <main class="pt-8 pb-16 lg:pt-16 lg:pb-24">
+        <div class="flex justify-between px-4 mx-auto max-w-screen-xl ">
+            <header class="mb-4 lg:mb-6 not-format">
+                <h1 class="mb-4 text-3xl font-extrabold leading-tight lg:mb-6 lg:text-4xl">Output DeepHuman</h1>
+                <p><a href="{{ outdir if outdir else '/' }}" class="link underline">Click Here</a> to download the output file.</p>
+                <div class="mt-10">
+                    <a href="/" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Try Another Image
+                    </a>
+                </div>
+            </header>
+        </div>
+        <div class="flex justify-between px-4 mx-auto max-w-screen-xl">
+            <canvas id="canvasfill" class="w-full"></canvas>
+        </div>
+    </main>   
+</body>
+<script>
+    var renderer,
+    scene,
+    camera,
+    myCanvas = document.getElementById('canvasfill');
+
+    //RENDERER
+    renderer = new THREE.WebGLRenderer({
+    canvas: myCanvas,
+    antialias: true
+    });
+    renderer.setClearColor(0x000000);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    //CAMERA
+    camera = new THREE.PerspectiveCamera(3, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+    //SCENE
+    scene = new THREE.Scene();
+
+    //LIGHTS
+    var light = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(light);
+
+    var light2 = new THREE.PointLight(0xffffff, 0.5);
+    scene.add(light2);
+
+    var loader = new THREE.GLTFLoader();
+
+    loader.load('model.obj', handle_load);
+
+    var mesh;
+
+    function handle_load(gltf) {
+        console.log(gltf);
+        mesh = gltf.scene;
+        console.log(mesh.children[0]);
+        mesh.children[0].material = new THREE.MeshLambertMaterial();
+        scene.add( mesh );
+        mesh.position.z = -10;
+    }
+
+    //RENDER LOOP
+    render();
+    
+    var delta = 0;
+    var prevTime = Date.now();
+    
+    function render() {
+        delta += 0.1;
+        if (mesh) {
+            mesh.rotation.y += 0.01;
+            //animation mesh
+            // mesh.morphTargetInfluences[ 0 ] = Math.sin(delta) * 20.0;
+        }
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+    }
+</script>
+</html>

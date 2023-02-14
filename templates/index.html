@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>File Upload</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              clifford: '#da373d',
+            }
+          }
+        }
+      }
+    </script>
+    <script>
+      function onLoad() {
+
+        var form = document.querySelector('#fileUploadForm');
+        var inputFile = document.getElementById('input-file-upload');
+        var output = document.getElementById("imagePreview");
+
+        function changeLabelText() {
+          const file = inputFile.files[0];
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            output.src = e.target.result;
+            output.classList.remove('hidden');
+          }
+          reader.readAsDataURL(file);
+
+          var labelValue = inputFile.value;
+          var fileNameStart = labelValue.lastIndexOf('\\');
+          labelValue = labelValue.substr(fileNameStart + 1);
+
+          var labelFormText = document.getElementById('label-form-text');
+          if (labelValue !== '') {
+            labelFormText.textContent = labelValue;
+          } else {
+            labelFormText.textContent = 'Drag & Drop your files here';
+          }
+        }
+        
+        inputFile.addEventListener('change', changeLabelText, false);
+
+        form.addEventListener('submit', (event) => {
+          event.preventDefault();
+          
+          //disable button buttonUpload
+          var buttonUpload = document.getElementById('buttonUpload');
+          buttonUpload.disabled = true;
+          buttonUpload.textContent = 'Processing...';
+
+          // set progress bar fake
+          var progressBar = document.getElementById('progress_');
+          progressBar.style.width = '0%';
+
+          var progress = 0;
+          var interval = setInterval(function() {
+            progress += 1;
+
+            var elapsed_time = '';
+            var hour = Math.floor(elapsed_time_seconds / 3600);
+            var minute = Math.floor((elapsed_time_seconds - hour * 3600) / 60);
+            var second = elapsed_time_seconds - hour * 3600 - minute * 60;
+            if (hour > 0) {
+              elapsed_time += hour + 'h ';
+            }
+            if (minute > 0) {
+              elapsed_time += minute + 'm ';
+            }
+            elapsed_time += second + 's';
+
+            progressBar.style.width = progress + '%';
+            // change text progress_text
+            var progressText = document.getElementById('progress_text');
+            progressText.textContent = 'Uploading... ' + progress + '%';
+            if (progress > 30) {
+              progressText.textContent = 'Processing... ' + progress + '%';
+            }
+            if (progress == 100) {
+              progressText.textContent = 'Running Optimization... ' + progress + '%';
+              clearInterval(interval);
+            }
+            if (progress >= 300) {
+              progressText.textContent = 'Loaded vertices and constructing network normal refiner' + elapsed_time;
+            }
+            if (progress >= 400) {
+              progressText.textContent = 'Constructing network... ' + elapsed_time;
+            }
+            if (progress >= 480) {
+              progressText.textContent = 'The whole graph has 12548944 trainable parameters... ' + elapsed_time;
+            }
+            if (progress >= 500){
+              progressText.textContent = 'Done. Waiting for post processing...';
+            }
+          }, 1000);
+
+          event.target.submit();
+        })
+      }
+
+      window.onload = onLoad;
+    </script>
+  </head>
+  <body>
+    <div class="h-screen font-sans text-gray-900 bg-gray-300 border-box">
+      <div class="flex justify-center w-full mx-auto sm:max-w-lg">
+        <div class="flex flex-col items-center justify-center w-full h-[550px] my-10 bg-white sm:w-3/4 sm:rounded-lg sm:shadow-xl">
+            <div class="mb-10 text-center">
+                <h2 class="text-2xl font-semibold mb-2">Upload your files</h2>
+                <p style="color:rgb(255,1,1);font-size:12px;">After clicking submit, <br/>it will take approximately a few minute to generate output.<br/>Please don't exit the page.</p>
+                <p class="text-xs text-gray-500">File should be of format .png, .jpg with 3 color channel</p>
+            </div>
+            <form action="/" id="fileUploadForm" method="post" class="relative w-4/5 h-32 max-w-xs mb-10 bg-white bg-gray-100 rounded-lg shadow-inner" enctype="multipart/form-data">
+                <input type="file" id="input-file-upload" accept="image/jpeg, image/png, image/jpg" class="hidden" name="file"/>
+                <label for="input-file-upload" class="z-20 flex flex-col-reverse items-center justify-center w-full h-full cursor-pointer">
+                    <img id="imagePreview" src="#" alt="Image preview" class="w-[200px] h-[200px] hidden">
+                    <p id="label-form-text" class="z-10 text-xs font-light text-center text-gray-500">Drag & Drop your files here</p>
+                    <svg class="z-10 w-8 h-8 text-indigo-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
+                    </svg>
+                </label>
+                <div class="mt-10 w-full flex text-center justify-center">
+                  <input id="buttonUpload" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" type="submit" value="Upload"/>
+                </div>
+            </form>
+
+            <div class="w-full mt-20 flex text-center justify-center">
+              <div class="w-4/5">
+                <div class="bg-gray-200 overflow-hidden h-2 mb-4 text-xs flex rounded">
+                  <div style="width: 0%" id="progress_" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500">
+                  </div>
+                </div>
+                <p id="progress_text">Progress Text</p>
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
